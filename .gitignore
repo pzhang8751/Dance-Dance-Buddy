@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+
+# vite build output
+dist/
+
+# electron build output
+out/
+release/
+
+# environment variables — never commit these
+.env
+.env.local
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# os files
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
+
+# editor
+.vscode/
+.idea/
+
+# electron cache
+.electron/
