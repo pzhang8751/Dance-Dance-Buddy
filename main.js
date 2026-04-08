@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, session } = require('electron')
 const path = require('path')
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -32,6 +32,11 @@ ipcMain.handle('dialog:openVideo', async () => {
 })
 
 app.whenReady().then(() => {
+  // allowing camera usage
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    if (permission === 'media') callback(true)
+  })
+
   createWindow()
 })
 

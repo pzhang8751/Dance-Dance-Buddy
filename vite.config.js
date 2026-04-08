@@ -5,6 +5,11 @@ export default defineConfig({
   plugins: [react()],
   base: './',  // important for Electron — uses relative paths
   build: {
-    outDir: 'dist'
+    outDir: 'dist',
+  },
+  resolve: {
+    alias: {
+      '@mediapipe/pose': new URL('./src/empty.js', import.meta.url).pathname
+    }
   }
 })
