@@ -30,9 +30,7 @@ export const usePoseDetection = (videoRef, setKeypoints) => {
         async function detect() {
             if (videoRef.current?.readyState === 4) {
                 const poses = await detectorRef.current.estimatePoses(videoRef.current)
-
-
-                console.log(poses)
+                
                 setKeypoints(poses[0]?.keypoints ?? [])
 
                 setKeypoints(poses[0]?.keypoints ?? [])

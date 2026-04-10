@@ -1,0 +1,16 @@
+
+.placeholder-container {
+    width: 640px;
+    height: 200px;
+    border-style: dashed;
+    border-width: 5px; 
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    place-items: center;
+}
+
+.placeholder-container:hover {
+    cursor: pointer;
+    background-color: brown;
+}

@@ -1,48 +1,56 @@
 import { useState, useEffect, useRef } from "react"
-import { useCamera } from "./hooks/useCamera"
-import { CONNECTIONS } from "./utils/poseUtils"
-import { usePoseDetection } from "./hooks/usePoseDetection"
+import { VideoUpload } from "./components/VideoUpload"
+import VideoUploadPlaceholder from "./components/VideoUploadPlaceholder"
+import './App.css'
+import { Camera } from "./styles/Camera"
 
 export default function App() {
+  // logic for live camera
+  const cameraRef = useRef(null)
 
-  const videoRef = useRef(null)
-  const canvasRef = useRef(null)
-  const [keypoints, setKeypoints] = useState([])
 
-  useCamera(videoRef)
-  usePoseDetection(videoRef, setKeypoints)
+  // logic for upload video
+  const referenceVideoRef = useRef(null)
+  const [refVideoPath, setRefVideoPath] = useState(null)
 
-useEffect(() => {
-  if (!canvasRef.current || keypoints.length === 0) return
+  const isOpeningDialog = useRef(false)
 
-  const ctx = canvasRef.current.getContext('2d')
-  ctx.clearRect(0, 0, 640, 480)
+  const handleUpload = async () => {
+    if (isOpeningDialog.current) return   // already open, do nothing
 
-  const kpMap = Object.fromEntries(keypoints.map(kp => [kp.name, kp]))
+    isOpeningDialog.current = true
+    const filePath = await window.electronAPI.openVideo()
+    isOpeningDialog.current = false
 
-  CONNECTIONS.forEach(([a, b]) => {
-    const kpA = kpMap[a], kpB = kpMap[b]
-    if (!kpA || !kpB) return  // add this too
-    if (kpA.score < 0.35 || kpB.score < 0.35) return
+    if (filePath) setRefVideoPath(filePath)
+  }
 
-    ctx.beginPath()
-    ctx.moveTo(kpA.x, kpA.y)
-    ctx.lineTo(kpB.x, kpB.y)
-    ctx.strokeStyle = 'lime'
-    ctx.lineWidth = 2
-    ctx.stroke()
-  })
-}, [keypoints])
+  const handleClose = () => {
+    setRefVideoPath(null)
+  }
+
+
+  // logic for starting application 
+  const handleStart = () => {
+    cameraRef.current.startCountdown()
+    referenceVideoRef.current.startCountdown()
+
+  }
 
   return (
     <div className="app-container">
       {/* 2 sections one side that is your camera the other uploads your video */}
+      <div className="divider">
+        <Camera ref={cameraRef}/>
 
-      <div style={{ position: 'relative', width: 640, height: 480 }}>
-        <video ref={videoRef} width={640} height={480} />
-        <canvas ref={canvasRef} width={640} height={480}
-          style={{ position: 'absolute', top: 0, left: 0 }} />
+        {refVideoPath
+          ? <VideoUpload ref={referenceVideoRef } src={`file://${refVideoPath}`} onClick={() => handleClose()} />
+          : <VideoUploadPlaceholder onUpload={() => handleUpload()} />
+        }
+
       </div>
+
+      {refVideoPath && <button className="start-button" onClick={handleStart}>Start</button>}
     </div>
   )
 }
